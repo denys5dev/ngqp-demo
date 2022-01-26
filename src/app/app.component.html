@@ -1,4 +1,4 @@
-<div class="container">
+<ng-container [queryParamGroup]="paramGroup">
   <dx-data-grid
     id="gridContainer"
     #dataGrid
@@ -11,6 +11,7 @@
     <dxo-selection mode="single"></dxo-selection>
     <dxo-search-panel [visible]="true"></dxo-search-panel>
     <dxo-filter-row [visible]="true"></dxo-filter-row>
+    <dxo-header-filter [visible]="true"></dxo-header-filter>
     <dxo-group-panel [visible]="true"></dxo-group-panel>
     <dxo-state-storing
       [enabled]="true"
@@ -18,7 +19,7 @@
       [storageKey]="storageKey"
       [customLoad]="loadState"
       [customSave]="saveState"
-      [savingTimeout]="0"
+      [savingTimeout]="100"
     >
     </dxo-state-storing>
     <dxo-pager
@@ -45,8 +46,4 @@
     <dxi-column dataField="CustomerStoreCity" caption="City"></dxi-column>
     <dxi-column dataField="CustomerStoreState" caption="State"></dxi-column>
   </dx-data-grid>
-</div>
-
-<ng-container [queryParamGroup]="paramGroup">
-  <input type="text" queryParamName="searchText" />
 </ng-container>

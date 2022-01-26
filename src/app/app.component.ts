@@ -1,20 +1,19 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Service, Order } from './app.service';
 import { DxDataGridComponent } from 'devextreme-angular';
 import { QueryParamBuilder, QueryParamGroup } from '@ngqp/core';
-import { Subject } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
   @ViewChild(DxDataGridComponent) dataGrid!: DxDataGridComponent;
   orders!: Order[];
-  paramGroup!: QueryParamGroup;
   storageKey: string = 'datagrid-state';
-  private destroy$: Subject<boolean> = new Subject<boolean>();
+
+  paramGroup!: QueryParamGroup;
 
   constructor(
     private service: Service,
@@ -28,8 +27,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.paramGroup = this.qpb.group({
       searchText: this.qpb.stringParam('searchText'),
       pageIndex: this.qpb.numberParam('pageIndex'),
-      pageSize: this.qpb.numberParam('pageSize'),
       filterValue: this.qpb.stringParam('filterValue'),
+      columns: this.qpb.stringParam('columns', {
+        serialize: (value: any): string => JSON.stringify(value),
+        deserialize: (value: string): any => JSON.parse(value),
+      }),
     });
   }
 
@@ -42,22 +44,13 @@ export class AppComponent implements OnInit, OnDestroy {
   };
 
   saveState = (state: any) => {
+    this.paramGroup.patchValue(state);
+
     if (state) {
       for (let i = 0; i < state.columns.length; i++) {
         state.columns[i].filterValue = null;
       }
     }
     localStorage.setItem(this.storageKey, JSON.stringify(state));
-
-    this.paramGroup.patchValue(state);
   };
-
-  onStateResetClick() {
-    this.dataGrid.instance.state(null);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
-  }
 }
